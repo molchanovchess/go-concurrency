@@ -6,17 +6,35 @@ import (
 )
 
 func main() {
-	greet("Nice to meet you!")
-	greet("How are you?")
-	slowGreet("How ... are ... you ... ?")
-	greet("I hope OK!")
+	// dones := make([]chan bool, 4)
+	done := make(chan bool)
+
+	// dones[0] = make(chan bool)
+	go greet("Nice to meet you!", done)
+	// dones[1] = make(chan bool)
+	go greet("How are you?", done)
+	// dones[2] = make(chan bool)
+	go slowGreet("How ... are ... you ... ?", done)
+	// dones[3] = make(chan bool)
+	go greet("I hope OK!", done)
+
+	// for _, done := range dones {
+	// 	<-done
+	// }
+
+	for range done {
+		// fmt.Println(doneChan)
+	}
 }
 
-func greet(phrase string) {
+func greet(phrase string, doneChan chan bool) {
 	fmt.Println("Hello!", phrase)
+	doneChan <- true
 }
 
-func slowGreet(phrase string) {
+func slowGreet(phrase string, doneChan chan bool) {
 	time.Sleep(3 * time.Second)
 	fmt.Println("Hello!", phrase)
+	doneChan <- true
+	close(doneChan)
 }
